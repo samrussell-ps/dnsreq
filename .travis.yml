@@ -1,0 +1,7 @@
+language: ruby
+rvm:
+  - 2.2.3
+script: rspec spec
+addons:
+  code_climate:
+    repo_token: 
