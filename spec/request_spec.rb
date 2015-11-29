@@ -4,9 +4,8 @@ require './lib/request'
 describe Request do
   let(:request_id) { 0x1234 }
   let(:request_type) { 'A' }
-  let(:server) { '205.251.197.243' }
   let(:domain) { 'powershop.co.nz' }
-  subject(:request) { Request.new(domain: domain, server: server, request_type: request_type, request_id: request_id) }
+  subject(:request) { Request.new(domain: domain, request_type: request_type, request_id: request_id) }
 
   describe '#pack' do
     subject { request.pack }

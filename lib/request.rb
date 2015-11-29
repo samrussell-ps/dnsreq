@@ -3,9 +3,8 @@ class Request
     'A' => 1
   }
 
-  def initialize(domain:, server:, request_type:, request_id:)
+  def initialize(domain:, request_type:, request_id:)
     @domain = domain
-    @server = server
     @request_type = request_type
     @request_id = request_id
   end
