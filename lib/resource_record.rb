@@ -4,7 +4,8 @@ require 'stringio'
 class ResourceRecord
   RECORD_TYPES = {
     'A' => 1,
-    'NS' => 2
+    'NS' => 2,
+    'AAAA' => 28
   }
   attr_reader :name, :rdata, :record_type
 
@@ -23,6 +24,8 @@ class ResourceRecord
       as_ip_address
     when RECORD_TYPES['NS']
       as_name
+    when RECORD_TYPES['AAAA']
+      as_ip6_address
     end
   end
 
@@ -49,4 +52,9 @@ class ResourceRecord
 
     name = Name.unpack(rdata_stream, @packed_response).to_s
   end
+
+  def as_ip6_address
+    @rdata.unpack('H32').join.scan(/..../).join(':')
+  end
+
 end
