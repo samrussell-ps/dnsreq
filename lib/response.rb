@@ -25,6 +25,10 @@ class Response
 
     answers = unpack_resource_records(packed_stream, packed_response, answers_count)
 
+    authority_rrs = unpack_resource_records(packed_stream, packed_response, authority_rrs_count)
+
+    additional_rrs = unpack_resource_records(packed_stream, packed_response, additional_rrs_count)
+
     new(request_id: request_id, questions: questions, answers: answers)
   end
 
