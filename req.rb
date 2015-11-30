@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require './lib/request'
+require './lib/response'
 require 'socket'
 
 domain = ARGV[0]
@@ -14,5 +15,8 @@ socket = UDPSocket.new
 socket.connect(server, 53)
 socket.send(packed_request, 0)
 
-p socket.recvfrom(1500)
+packed_response = socket.recv(1500)
 
+response = Response.unpack(packed_response)
+
+puts response.answers.first.to_s

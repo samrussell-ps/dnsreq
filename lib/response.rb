@@ -1,4 +1,5 @@
 require 'stringio'
+require './lib/name'
 
 class Response
   HEADER_UNPACK_STRING = 'nnnnnn'
@@ -6,7 +7,7 @@ class Response
 
   attr_reader :request_id, :questions, :answers
 
-  def initialize(request_id:, questions: questions, answers:)
+  def initialize(request_id:, questions:, answers:)
     @request_id = request_id
     @questions = questions
     @answers = answers
@@ -19,20 +20,20 @@ class Response
 
     request_id, flags, questions_count, answers_count, authority_rrs_count, additional_rrs_count = packed_header.unpack(HEADER_UNPACK_STRING)
 
-    questions = unpack_questions(packed_stream, questions_count)
+    questions = unpack_questions(packed_stream, packed_response, questions_count)
 
-    answers = unpack_resource_records(packed_stream, answers_count)
+    answers = unpack_resource_records(packed_stream, packed_response, answers_count)
 
     new(request_id: request_id, questions: questions, answers: answers)
   end
 
   private
 
-  def self.unpack_questions(packed_stream, count)
-    count.times.map { unpack_question(packed_stream) }
+  def self.unpack_questions(packed_stream, packed_response, count)
+    count.times.map { unpack_question(packed_stream, packed_response) }
   end
 
-  def self.unpack_question(packed_stream)
+  def self.unpack_question(packed_stream, packed_response)
     question_octets = []
 
     loop do
@@ -56,16 +57,26 @@ class Response
     packed_stream.read(octets_length) if octets_length > 0
   end
 
-  def self.unpack_resource_records(packed_stream, count)
-    count.times.map { unpack_resource_record(packed_stream) }
+  def self.unpack_resource_records(packed_stream, packed_response, count)
+    count.times.map { unpack_resource_record(packed_stream, packed_response) }
   end
 
-  def self.unpack_resource_record(packed_stream)
-    name = unpack_name(packed_stream)
+  def self.unpack_resource_record(packed_stream, packed_response)
+    name = unpack_name(packed_stream, packed_response)
+    packed_type = packed_stream.read(2)
+    packed_class = packed_stream.read(2)
+    packed_ttl = packed_stream.read(4)
+    packed_rd_length = packed_stream.read(2)
 
+    rd_length = packed_rd_length.unpack('n').first
+
+    rdata = packed_stream.read(rd_length)
+
+    rdata.unpack('C*').join('.')
   end
 
-  def self.unpack_name(packed_stream)
+  def self.unpack_name(packed_stream, packed_response)
+    return Name.unpack(packed_stream, packed_response).to_s
     name_octets = []
 
     loop do
@@ -76,15 +87,6 @@ class Response
       break unless octets
     end
 
-    # TODO this is hax but it works for now
-    packed_name_class = packed_stream.read(1)
-    packed_name_type = packed_stream.read(2)
-    packed_ttl = packed_stream.read(4)
-    packed_rd_length = packed_stream.read(2)
-
-    rd_length = packed_rd_length.unpack('n').first
-
-    rdata = packed_stream.read(rd_length)
 
     name_octets.compact.join('.')
   end

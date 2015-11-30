@@ -10,7 +10,9 @@ describe Response do
     it 'unpacks correctly' do
       expect(response.request_id).to eq(0x1234)
       expect(response.questions.length).to eq(1)
+      expect(response.questions.first).to eq('powershop.co.nz')
       expect(response.answers.length).to eq(1)
+      expect(response.answers.first.to_s).to eq('203.171.34.211')
     end
   end
 end
