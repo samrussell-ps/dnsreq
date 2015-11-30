@@ -1,4 +1,5 @@
 require './lib/resource_record'
+require './lib/name'
 
 class Request
   def initialize(domain:, request_type:, request_id:)
@@ -34,9 +35,7 @@ class Request
   end
 
   def packed_domain_string
-    @domain.split('.').map do |octets|
-      [octets.length].pack('C') + [octets].pack('a*')
-    end.join + [0].pack('C')
+    Name.new(name: @domain).pack
   end
 
   def packed_request_type

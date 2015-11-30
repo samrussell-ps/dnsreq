@@ -3,13 +3,18 @@ require 'stringio'
 class Name
   attr_reader :name, :length, :offset
 
-  def initialize(name:, length:)
+  def initialize(name:)
     @name = name
-    @length = length
   end
 
   def to_s
     @name
+  end
+
+  def pack
+    @name.split('.').map do |octets|
+      [octets.length].pack('C') + [octets].pack('a*')
+    end.join + [0].pack('C')
   end
 
   def self.unpack(packed_stream, packed_string)
@@ -19,7 +24,7 @@ class Name
 
     bytes_read = packed_stream.tell - initial_offset
 
-    new(name: name, length: bytes_read)
+    new(name: name)
   end
 
   def self.unpack_name(packed_stream, packed_string)

@@ -10,32 +10,37 @@ describe Name do
     context 'with a non-compressed name' do
       let(:packed_length) { 17 }
       let(:unpacked_name) { 'powershop.co.nz' }
-      let(:offset) { nil }
+      let(:offset) { 12 }
+      let(:packed_name_only) { "\tpowershop\x02co\x02nz\x00".force_encoding('ASCII-8BIT') }
       let(:name) { Name.unpack(packed_name, packed_response) }
 
       before do
-        packed_name.seek(12)
+        packed_name.seek(offset)
       end
 
       it 'unpacks the name' do
         expect(name.to_s).to eq(unpacked_name)
-        expect(name.length).to eq(packed_length)
+        expect(packed_name.tell).to eq(offset + packed_length)
+      end
+
+      it 'packs to itself' do
+        expect(name.pack).to eq(packed_name_only)
       end
     end
 
     context 'with a compressed name' do
       let(:packed_length) { 2 }
       let(:unpacked_name) { 'powershop.co.nz' }
-      let(:offset) { 12 }
+      let(:offset) { 33 }
       let(:name) { Name.unpack(packed_name, packed_response) }
 
       before do
-        packed_name.seek(33)
+        packed_name.seek(offset)
       end
 
       it 'unpacks the name' do
         expect(name.to_s).to eq(unpacked_name)
-        expect(name.length).to eq(packed_length)
+        expect(packed_name.tell).to eq(offset + packed_length)
       end
     end
   end
