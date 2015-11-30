@@ -61,8 +61,4 @@ class Response
   def self.unpack_resource_records(packed_stream, packed_response, count)
     count.times.map { ResourceRecord.unpack(packed_stream, packed_response) }
   end
-
-  def self.unpack_name(packed_stream, packed_response)
-    return Name.unpack(packed_stream, packed_response).to_s
-  end
 end
