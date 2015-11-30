@@ -32,8 +32,8 @@ class Name
 
     octets_length = read_octets_length(packed_stream)
 
-    if octets_length < 0xc0
-      loop do
+    loop do
+      if octets_length < 0xc0
         octets = packed_stream.read(octets_length)
 
         name_octets << octets
@@ -41,19 +41,21 @@ class Name
         octets_length = read_octets_length(packed_stream)
 
         break if octets_length == 0
+      else
+        second_octet = packed_stream.read(1).unpack('C').first
+        offset = ((octets_length & 0x3f) << 8) | second_octet
+
+        offset_stream = StringIO.new(packed_string)
+
+        offset_stream.seek(offset)
+
+        name_octets << Name.unpack(offset_stream, packed_string).to_s
+
+        break
       end
-
-      name_octets.join('.')
-    else
-      second_octet = packed_stream.read(1).unpack('C').first
-      offset = ((octets_length & 0x3f) << 8) | second_octet
-
-      offset_stream = StringIO.new(packed_string)
-
-      offset_stream.seek(offset)
-
-      Name.unpack(offset_stream, packed_string).to_s
     end
+
+    name_octets.join('.')
   end
 
   def self.read_octets_length(packed_stream)

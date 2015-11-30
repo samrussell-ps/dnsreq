@@ -6,12 +6,14 @@ class Response
   HEADER_UNPACK_STRING = 'nnnnnn'
   HEADER_LENGTH = 12
 
-  attr_reader :request_id, :questions, :answers
+  attr_reader :request_id, :questions, :answers, :authority_rrs, :additional_rrs
 
-  def initialize(request_id:, questions:, answers:)
+  def initialize(request_id:, questions:, answers:, authority_rrs: nil, additional_rrs: nil)
     @request_id = request_id
     @questions = questions
     @answers = answers
+    @authority_rrs = authority_rrs
+    @additional_rrs = additional_rrs
   end
 
   def self.unpack(packed_response)
@@ -29,7 +31,7 @@ class Response
 
     additional_rrs = unpack_resource_records(packed_stream, packed_response, additional_rrs_count)
 
-    new(request_id: request_id, questions: questions, answers: answers)
+    new(request_id: request_id, questions: questions, answers: answers, authority_rrs: authority_rrs, additional_rrs: additional_rrs)
   end
 
   private

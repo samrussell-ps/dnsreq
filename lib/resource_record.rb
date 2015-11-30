@@ -6,14 +6,15 @@ class ResourceRecord
     'A' => 1,
     'NS' => 2
   }
-  attr_reader :name, :rdata
+  attr_reader :name, :rdata, :record_type
 
-  def initialize(name:, record_type:, record_class:, record_ttl:, rdata:)
+  def initialize(name:, record_type:, record_class:, record_ttl:, rdata:, packed_response:)
     @name = name
     @record_type = record_type
     @record_class = record_class
     @record_ttl = record_ttl
     @rdata = rdata
+    @packed_response = packed_response
   end
 
   def to_s
@@ -34,7 +35,7 @@ class ResourceRecord
 
     rdata = packed_stream.read(rdata_length)
 
-    new(name: name, record_type: record_type, record_class: record_class, record_ttl: record_ttl, rdata: rdata)
+    new(name: name, record_type: record_type, record_class: record_class, record_ttl: record_ttl, rdata: rdata, packed_response: packed_response)
   end
 
   private
@@ -46,6 +47,6 @@ class ResourceRecord
   def as_name
     rdata_stream = StringIO.new(@rdata)
 
-    name = Name.unpack(rdata_stream, @rdata).to_s
+    name = Name.unpack(rdata_stream, @packed_response).to_s
   end
 end
