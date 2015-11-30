@@ -1,5 +1,6 @@
 require 'stringio'
 require './lib/name'
+require './lib/resource_record'
 
 class Response
   HEADER_UNPACK_STRING = 'nnnnnn'
@@ -58,21 +59,7 @@ class Response
   end
 
   def self.unpack_resource_records(packed_stream, packed_response, count)
-    count.times.map { unpack_resource_record(packed_stream, packed_response) }
-  end
-
-  def self.unpack_resource_record(packed_stream, packed_response)
-    name = unpack_name(packed_stream, packed_response)
-    packed_type = packed_stream.read(2)
-    packed_class = packed_stream.read(2)
-    packed_ttl = packed_stream.read(4)
-    packed_rd_length = packed_stream.read(2)
-
-    rd_length = packed_rd_length.unpack('n').first
-
-    rdata = packed_stream.read(rd_length)
-
-    rdata.unpack('C*').join('.')
+    count.times.map { ResourceRecord.unpack(packed_stream, packed_response) }
   end
 
   def self.unpack_name(packed_stream, packed_response)

@@ -1,8 +1,6 @@
-class Request
-  REQUEST_TYPES = {
-    'A' => 1
-  }
+require './lib/resource_record'
 
+class Request
   def initialize(domain:, request_type:, request_id:)
     @domain = domain
     @request_type = request_type
@@ -42,7 +40,7 @@ class Request
   end
 
   def packed_request_type
-    [REQUEST_TYPES[@request_type]].pack('n')
+    [ResourceRecord::RECORD_TYPES[@request_type]].pack('n')
   end
 
   def packed_request_class

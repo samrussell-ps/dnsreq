@@ -1,6 +1,11 @@
-require 'name'
+require './lib/name'
+require 'stringio'
 
 class ResourceRecord
+  RECORD_TYPES = {
+    'A' => 1,
+    'NS' => 2
+  }
   attr_reader :name, :rdata
 
   def initialize(name:, record_type:, record_class:, record_ttl:, rdata:)
@@ -9,6 +14,15 @@ class ResourceRecord
     @record_class = record_class
     @record_ttl = record_ttl
     @rdata = rdata
+  end
+
+  def to_s
+    case @record_type
+    when RECORD_TYPES['A']
+      as_ip_address
+    when RECORD_TYPES['NS']
+      as_name
+    end
   end
 
   def self.unpack(packed_stream, packed_response)
@@ -21,5 +35,17 @@ class ResourceRecord
     rdata = packed_stream.read(rdata_length)
 
     new(name: name, record_type: record_type, record_class: record_class, record_ttl: record_ttl, rdata: rdata)
+  end
+
+  private
+
+  def as_ip_address
+    @rdata.unpack('C4').join('.')
+  end
+
+  def as_name
+    rdata_stream = StringIO.new(@rdata)
+
+    name = Name.unpack(rdata_stream, @rdata).to_s
   end
 end
