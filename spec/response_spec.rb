@@ -10,6 +10,7 @@ describe Response do
     it 'unpacks correctly' do
       expect(response.request_id).to eq(0x1234)
       expect(response.questions.length).to eq(1)
+      expect(response.answers.length).to eq(1)
     end
   end
 end
