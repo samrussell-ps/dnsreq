@@ -77,34 +77,5 @@ class Response
 
   def self.unpack_name(packed_stream, packed_response)
     return Name.unpack(packed_stream, packed_response).to_s
-    name_octets = []
-
-    loop do
-      octets = unpack_name_octets(packed_stream)
-
-      name_octets << octets
-
-      break unless octets
-    end
-
-
-    name_octets.compact.join('.')
-  end
-
-  def self.unpack_ip_address(packed_ip_address)
-    packed_ip_address.unpack('C4').join('.')
-  end
-
-  def self.unpack_name_octets(packed_stream)
-    packed_octets_length = packed_stream.read(1)
-    octets_length = packed_octets_length.unpack('C').first
-
-    if octets_length >= 0xc0
-      # TODO fill this in
-      packed_stream.read(1)
-      'unknown'
-    elsif octets_length > 0
-      packed_stream.read(octets_length)
-    end
   end
 end

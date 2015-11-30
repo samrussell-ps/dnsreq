@@ -3,7 +3,7 @@ require 'name'
 class ResourceRecord
   attr_reader :name, :rdata
 
-  def initialize(name: name, record_type: record_type, record_class: record_class, record_ttl: record_ttl, rdata: rdata)
+  def initialize(name:, record_type:, record_class:, record_ttl:, rdata:)
     @name = name
     @record_type = record_type
     @record_class = record_class
